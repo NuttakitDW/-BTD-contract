@@ -70,6 +70,7 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         // You can tip BitToonDAO Team if you want.
 
         require(isPrivate == true, "Private mint is not open.");
+        require(block.timestamp >= privateTime, "Private mint is not open.");
         require(getTotalSupply() + _amount <= getMaxSupply(), "Over supply amount.");
         require(privateUserMintedAmount(msg.sender) + _amount <= _maxAmount, "Exceed Whitelist Limit");
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender, _amount))), "Unauthorized user.");
@@ -84,6 +85,7 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         // You can tip BitToonDAO Team if you want.
         
         require(isPublic == true, "Public mint is not open.");
+        require(block.timestamp >= publicTime, "Public mint is not open.");
         require(tx.origin == msg.sender, "haha Contract can't call me");
         require(_amount <= 10, "Only 10 BTD per tx.");
         require(getTotalSupply() + _amount <= getMaxSupply(), "Over supply amount.");
