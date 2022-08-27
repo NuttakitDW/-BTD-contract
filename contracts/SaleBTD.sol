@@ -16,10 +16,16 @@ contract SaleBTD is Ownable, ReentrancyGuard {
     bool public isPrivate = false;
     bool public isPublic = false;
 
+    uint256 public publicPrice;
+    uint256 public privatePrice;
+
+    address public teamWallet;
+
     mapping(address => uint256) public _privateUserMintedAmount;
 
-    constructor(IBitToonDAO _bitToonDAO) {
+    constructor(IBitToonDAO _bitToonDAO, address _teamWallet) {
         setbitToonDAO(_bitToonDAO);
+        teamWallet = _teamWallet;
     }
 
     function setPublicMint(bool _bool) public onlyOwner {
@@ -49,6 +55,7 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         require(getTotalSupply() + _amount <= getMaxSupply(), "Over supply amount.");
         require(privateUserMintedAmount(msg.sender) + _amount <= _maxAmount, "Exceed Whitelist Limit");
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender, _amount))), "Unauthorized user.");
+        require(privatePrice * _amount <= msg.value, "Ether value sent is not correct");
 
         _privateUserMintedAmount[msg.sender] += _amount;
         bitToonDAO.safeMint(msg.sender,_amount);
@@ -62,21 +69,22 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         require(tx.origin == msg.sender, "haha Contract can't call me");
         require(_amount <= 10, "Only 10 BTD per tx.");
         require(getTotalSupply() + _amount <= getMaxSupply(), "Over supply amount.");
+        require(publicPrice * _amount <= msg.value, "Ether value sent is not correct");
 
         bitToonDAO.safeMint(msg.sender, _amount);
     }
 
-    function withdraw(address _to) public onlyOwner {
+    function withdraw() public {
         uint balanceOFContract = address(this).balance;
         require(balanceOFContract > 0, "Insufficient balance");
-        (bool status,) = _to.call{value: balanceOFContract }("");
+        (bool status,) = teamWallet.call{value: balanceOFContract }("");
         require(status);
     }
 
     function withdrawToken(address _to, address _token) public onlyOwner {
         uint balanceOfContract = IERC20(_token).balanceOf(address(this));
         require(balanceOfContract > 0, "Insufficient balance");
-        IERC20(_token).transfer(_to, balanceOfContract);
+        IERC20(_token).transfer(teamWallet, balanceOfContract);
     }
 
     function privateUserMintedAmount(address _user) public view returns(uint256) {
