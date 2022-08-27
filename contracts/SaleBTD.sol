@@ -73,6 +73,7 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         require(block.timestamp >= privateTime, "Private mint is not open.");
         require(getTotalSupply() + _amount <= getMaxSupply(), "Over supply amount.");
         require(privateUserMintedAmount(msg.sender) + _amount <= _maxAmount, "Exceed Whitelist Limit");
+        require(privateUserMintedAmount(msg.sender) + _amount <= 2, "Exceed Maximum Limit"); //Just in case Human Error from wl list
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender, _maxAmount))), "Unauthorized user.");
         require(privatePrice * _amount <= msg.value, "Ether value sent is not correct");
 
