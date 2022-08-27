@@ -13,19 +13,25 @@ contract SaleBTD is Ownable, ReentrancyGuard {
     IBitToonDAO public bitToonDAO;
     bytes32 public merkleRoot;
 
-    bool public isPrivate = false;
-    bool public isPublic = false;
+    bool public isPrivate;
+    bool public isPublic;
 
-    uint256 public publicPrice;
     uint256 public privatePrice;
+    uint256 public publicPrice;
 
     address public teamWallet;
 
     mapping(address => uint256) public _privateUserMintedAmount;
 
-    constructor(IBitToonDAO _bitToonDAO, address _teamWallet) {
-        setbitToonDAO(_bitToonDAO);
+    constructor(IBitToonDAO _bitToonDAO, address _teamWallet, uint256 _privatePrice, uint256 _publicPrice) {
+
+        bitToonDAO = _bitToonDAO;
         teamWallet = _teamWallet;
+        privatePrice = _privatePrice;
+        publicPrice = _publicPrice;
+
+        isPrivate = false;
+        isPublic = false;
     }
 
     function setPublicMint(bool _bool) public onlyOwner {
@@ -40,6 +46,10 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         address oldbitToonDAO = address(bitToonDAO);
         bitToonDAO = _bitToonDAO;
         address newbitToonDAO = address(_bitToonDAO);
+    }
+
+    function setTeamWallet(address _teamWallet) public onlyOwner {
+        teamWallet = _teamWallet;
     }
 
     function setMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
@@ -74,18 +84,15 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         bitToonDAO.safeMint(msg.sender, _amount);
     }
 
-    function withdraw() public {
-        uint balanceOFContract = address(this).balance;
-        require(balanceOFContract > 0, "Insufficient balance");
-        (bool status,) = teamWallet.call{value: balanceOFContract }("");
-        require(status);
+    function devMint(address _to, uint256 _amount) public onlyOwner {
+        require(getTotalSupply() + _amount <= getMaxSupply(), "Over supply amount.");
+        bitToonDAO.safeMint(_to, _amount);
     }
 
-    function withdrawToken(address _to, address _token) public onlyOwner {
-        uint balanceOfContract = IERC20(_token).balanceOf(address(this));
-        require(balanceOfContract > 0, "Insufficient balance");
-        IERC20(_token).transfer(teamWallet, balanceOfContract);
-    }
+    function withdrawMoney() external onlyOwner nonReentrant {
+    (bool success, ) = teamWallet.call{value: address(this).balance}("");
+    require(success, "Transfer failed.");
+  }
 
     function privateUserMintedAmount(address _user) public view returns(uint256) {
         return _privateUserMintedAmount[_user];
