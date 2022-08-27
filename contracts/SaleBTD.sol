@@ -21,6 +21,9 @@ contract SaleBTD is Ownable, ReentrancyGuard {
 
     address public teamWallet;
 
+    uint256 public privateTime;
+    uint256 public publicTime;
+
     mapping(address => uint256) public _privateUserMintedAmount;
 
     constructor(IBitToonDAO _bitToonDAO, address _teamWallet, uint256 _privatePrice, uint256 _publicPrice) {
@@ -32,7 +35,7 @@ contract SaleBTD is Ownable, ReentrancyGuard {
 
         isPrivate = false;
         isPublic = false;
-    }
+}                                                                                   
 
     function setPublicMint(bool _bool) public onlyOwner {
         isPublic = _bool;
@@ -55,6 +58,11 @@ contract SaleBTD is Ownable, ReentrancyGuard {
     function setMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
         bytes32 _oldMerkleRoot = merkleRoot;
         merkleRoot = _merkleRoot;
+    }
+
+    function setSaleTime(uint256 _privateTime, uint256 _publicTime) public onlyOwner {
+        privateTime = _privateTime;
+        publicTime = _publicTime;
     }
 
     function privateMint(bytes32[] calldata _proof,uint256 _maxAmount, uint256 _amount) public payable nonReentrant {
