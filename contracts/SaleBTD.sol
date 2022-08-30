@@ -16,8 +16,8 @@ contract SaleBTD is Ownable, ReentrancyGuard {
     bool public isPrivate;
     bool public isPublic;
 
-    uint256 public privatePrice;
-    uint256 public publicPrice;
+    uint256 public privatePrice = 0.065 ether;
+    uint256 public publicPrice = 0.085 ether;
 
     address public teamWallet;
 
@@ -26,12 +26,10 @@ contract SaleBTD is Ownable, ReentrancyGuard {
 
     mapping(address => uint256) public _privateUserMintedAmount;
 
-    constructor(IBitToonDAO _bitToonDAO, address _teamWallet, uint256 _privatePrice, uint256 _publicPrice) {
+    constructor(IBitToonDAO _bitToonDAO, address _teamWallet) {
 
         bitToonDAO = _bitToonDAO;
         teamWallet = _teamWallet;
-        privatePrice = _privatePrice;
-        publicPrice = _publicPrice;
 
         isPrivate = false;
         isPublic = false;
@@ -45,10 +43,8 @@ contract SaleBTD is Ownable, ReentrancyGuard {
         isPrivate = _bool;
     }
 
-    function setBitToonDAO(IBTD _bitToonDAO) public onlyOwner {
-        address oldbitToonDAO = address(bitToonDAO);
+    function setBitToonDAO(IBitToonDAO _bitToonDAO) public onlyOwner {
         bitToonDAO = _bitToonDAO;
-        address newbitToonDAO = address(_bitToonDAO);
     }
 
     function setTeamWallet(address _teamWallet) public onlyOwner {
@@ -56,7 +52,6 @@ contract SaleBTD is Ownable, ReentrancyGuard {
     }
 
     function setMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
-        bytes32 _oldMerkleRoot = merkleRoot;
         merkleRoot = _merkleRoot;
     }
 
@@ -98,6 +93,14 @@ contract SaleBTD is Ownable, ReentrancyGuard {
     function devMint(address _to, uint256 _amount) public onlyOwner {
         require(getTotalSupply() + _amount <= getMaxSupply(), "Over supply amount.");
         bitToonDAO.safeMint(_to, _amount);
+    }
+
+    function setPrivatePrice(uint256 _privatePrice) public onlyOwner {
+        privatePrice = _privatePrice;
+    }
+
+    function setPublicPrice(uint256 _publicPrice) public onlyOwner {
+        publicPrice = _publicPrice;
     }
 
     function withdrawMoney() external onlyOwner nonReentrant {

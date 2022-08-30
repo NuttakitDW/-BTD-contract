@@ -41,7 +41,7 @@ contract BitToonDAO is ERC721A, Ownable {
 
     function setMaxSupply(uint256 _maxSupply) public onlyOwner {
       maxSupply = _maxSupply;
-      emit setMaxSupply(msg.sender, maxSupply);
+      emit SetMaxSupply(msg.sender, maxSupply);
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -58,7 +58,7 @@ contract BitToonDAO is ERC721A, Ownable {
     function tokenURI(uint256 tokenId) public view virtual override(ERC721A) returns (string memory){
         require(
             _exists(tokenId),
-            "URI query for nonexistent token"
+            "ERC721Metadata: URI query for nonexistent token"
         );
 
         string memory currentBaseURI = _baseURI();

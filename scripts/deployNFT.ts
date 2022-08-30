@@ -5,6 +5,11 @@
 // Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
+function delay(ms: number) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
+
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
@@ -14,12 +19,20 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const MazkGang = await ethers.getContractFactory("MazkGang");
-  const mazk = await MazkGang.deploy(0, 1, 2, 3, 4, 10000, 10000, 10000);
+  const hre = require("hardhat");
+  const BitToonDAO = await ethers.getContractFactory("BitToonDAO");
+  const btd = await BitToonDAO.deploy("ssss", 3535);
 
-  await mazk.deployed();
+  await btd.deployed();
+  console.log("BitToonDAO deployed to:", btd.address);
 
-  console.log("MazkGang deployed to:", mazk.address);
+  await delay(60000);
+
+  await hre.run("verify:verify", {
+    address: btd.address,
+    constructorArguments: ["ssss", 3535],
+  }); 
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
