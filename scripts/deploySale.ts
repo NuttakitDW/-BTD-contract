@@ -21,7 +21,7 @@ async function main() {
   // We get the contract to deploy
   const hre = require("hardhat");
   const BitToonDAO = await ethers.getContractFactory("SaleBTD");
-  const btd = await BitToonDAO.deploy("0xDad20bEbEa81cf6E609c4BfF9b1Df5c651eBa663", "0x6F972cac70b93723a276559548A217205951FA65");
+  const btd = await BitToonDAO.deploy("0xF488a1Ac7aadD80755aE4F081A67e1E85820a8C3", "0x58f345301C620c0C4596CE218F92550669519Aee");
 
   await btd.deployed();
   console.log("BitToonDAO deployed to:", btd.address);
@@ -30,7 +30,7 @@ async function main() {
 
   await hre.run("verify:verify", {
     address: btd.address,
-    constructorArguments: ["0xDad20bEbEa81cf6E609c4BfF9b1Df5c651eBa663", "0x6F972cac70b93723a276559548A217205951FA65"],
+    constructorArguments: ["0xF488a1Ac7aadD80755aE4F081A67e1E85820a8C3", "0x58f345301C620c0C4596CE218F92550669519Aee"],
   }); 
 
 }

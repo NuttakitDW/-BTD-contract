@@ -21,7 +21,7 @@ async function main() {
   // We get the contract to deploy
   const hre = require("hardhat");
   const BitToonDAO = await ethers.getContractFactory("BitToonDAO");
-  const btd = await BitToonDAO.deploy("ssss", 3535);
+  const btd = await BitToonDAO.deploy("https://www.bittoondao.io/collection1/metadata/", 3535);
 
   await btd.deployed();
   console.log("BitToonDAO deployed to:", btd.address);
@@ -30,7 +30,7 @@ async function main() {
 
   await hre.run("verify:verify", {
     address: btd.address,
-    constructorArguments: ["ssss", 3535],
+    constructorArguments: ["https://www.bittoondao.io/collection1/metadata/", 3535],
   }); 
 
 }
